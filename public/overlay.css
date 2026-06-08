@@ -1,0 +1,284 @@
+/* OBS overlay — transparent background, broadcast-style scoreboard. */
+
+:root {
+  --font: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --radius: 10px;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: transparent;
+  font-family: var(--font);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Position: bottom-left by default. Override via OBS or ?pos= query. */
+.scoreboard {
+  position: fixed;
+  left: 40px;
+  bottom: 40px;
+  width: 560px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  opacity: 1;
+}
+
+.scoreboard.hidden {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+
+/* ---- Theme ---- */
+.scoreboard[data-theme='dark'] {
+  --bg: rgba(17, 20, 28, 0.92);
+  --bg-alt: rgba(28, 33, 46, 0.92);
+  --fg: #f5f7fa;
+  --muted: #9aa4b8;
+  --box-bg: rgba(255, 255, 255, 0.07);
+  --points-bg: #f5c518;
+  --points-fg: #1a1d26;
+  --title-bg: rgba(10, 12, 18, 0.95);
+}
+
+.scoreboard[data-theme='light'] {
+  --bg: rgba(248, 249, 252, 0.95);
+  --bg-alt: rgba(236, 239, 245, 0.95);
+  --fg: #14171f;
+  --muted: #5b6478;
+  --box-bg: rgba(0, 0, 0, 0.06);
+  --points-bg: #1a1d26;
+  --points-fg: #ffffff;
+  --title-bg: rgba(255, 255, 255, 0.97);
+}
+
+/* ---- Title bar ---- */
+.title-bar {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: var(--title-bg);
+  color: var(--fg);
+  padding: 8px 16px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  box-shadow: var(--shadow);
+}
+
+.title-bar.empty {
+  display: none;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ---- Board ---- */
+.board {
+  background: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+}
+
+.title-bar:not(.empty) + .board {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  color: var(--fg);
+  position: relative;
+}
+
+.team-row[data-team='1'] {
+  background: var(--bg-alt);
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.accent {
+  width: 6px;
+  align-self: stretch;
+  background: var(--team-color, #1e88e5);
+  flex: 0 0 auto;
+}
+
+.serve {
+  width: 26px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--points-bg);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  flex: 0 0 auto;
+}
+
+.serve.active {
+  opacity: 1;
+  animation: servePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes servePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+
+.team-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 10px;
+}
+
+.team-name {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.15;
+}
+
+.players {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.1;
+}
+
+.players.hidden {
+  display: none;
+}
+
+/* Score cells */
+.sets {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 0 6px;
+  flex: 0 0 auto;
+}
+
+.sets.hidden {
+  display: none;
+}
+
+.set-box {
+  min-width: 24px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--box-bg);
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  position: relative;
+}
+
+.set-box .tb {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  font-size: 9px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.games,
+.points {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.games {
+  width: 46px;
+  font-size: 24px;
+  font-weight: 700;
+  background: var(--box-bg);
+}
+
+.points {
+  width: 70px;
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--points-bg);
+  color: var(--points-fg);
+  letter-spacing: 0.02em;
+}
+
+.points.deuce,
+.points.ad {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.points.bump {
+  animation: pointBump 0.35s ease;
+}
+
+@keyframes pointBump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+/* ---- Winner banner ---- */
+.winner-banner {
+  margin-top: 10px;
+  background: var(--points-bg);
+  color: var(--points-fg);
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  padding: 10px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  animation: winnerIn 0.5s ease;
+}
+
+.winner-banner.hidden {
+  display: none;
+}
+
+@keyframes winnerIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}

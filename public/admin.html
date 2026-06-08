@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Padel Scoreboard — Control</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🎾 Padel Scoreboard <span class="brand-sub">Control Panel</span></div>
+    <div class="topbar-right">
+      <span id="connDot" class="conn-dot" title="connection"></span>
+      <span id="connText" class="conn-text">connecting…</span>
+      <span id="clientCount" class="client-count" title="overlays + panels connected"></span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: live scoring -->
+    <section class="col col-score">
+      <div class="card preview-card">
+        <div class="card-head">
+          <h2>Live</h2>
+          <span id="statusBadge" class="badge">idle</span>
+        </div>
+        <div id="preview" class="preview"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Scoring</h2></div>
+        <div class="score-grid">
+          <div class="team-scorer" data-team="0">
+            <div class="team-color-dot" data-cdot="0"></div>
+            <div class="team-scorer-name" data-sname="0"></div>
+            <button class="btn btn-point" data-point="0">+ POINT</button>
+            <button class="btn btn-minus" data-unpoint="0">− point</button>
+          </div>
+          <div class="team-scorer" data-team="1">
+            <div class="team-color-dot" data-cdot="1"></div>
+            <div class="team-scorer-name" data-sname="1"></div>
+            <button class="btn btn-point" data-point="1">+ POINT</button>
+            <button class="btn btn-minus" data-unpoint="1">− point</button>
+          </div>
+        </div>
+
+        <div class="row gap wrap actions">
+          <button class="btn btn-ghost" id="undoBtn">↶ Undo</button>
+          <button class="btn btn-ghost" id="redoBtn">↷ Redo</button>
+          <button class="btn btn-ghost" id="swapServeBtn">⇄ Swap serve</button>
+          <button class="btn btn-ghost" id="startBtn">▶ Start</button>
+        </div>
+        <p class="hint">Hotkeys: <b>Q</b>/<b>A</b> = left team point/undo-point · <b>P</b>/<b>L</b> = right team · <b>U</b> undo · <b>R</b> redo · <b>S</b> swap serve</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Manual adjust</h2></div>
+        <table class="adjust-table">
+          <thead>
+            <tr><th></th><th data-acol="0"></th><th data-acol="1"></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Games</td>
+              <td><button class="step" data-games-dec="0">−</button><span data-games-val="0">0</span><button class="step" data-games-inc="0">+</button></td>
+              <td><button class="step" data-games-dec="1">−</button><span data-games-val="1">0</span><button class="step" data-games-inc="1">+</button></td>
+            </tr>
+            <tr>
+              <td>Sets</td>
+              <td><button class="step" data-sets-dec="0">−</button><span data-sets-val="0">0</span><button class="step" data-sets-inc="0">+</button></td>
+              <td><button class="step" data-sets-dec="1">−</button><span data-sets-val="1">0</span><button class="step" data-sets-inc="1">+</button></td>
+            </tr>
+            <tr>
+              <td>Serving</td>
+              <td><button class="serve-pick" data-serve-pick="0">serve</button></td>
+              <td><button class="serve-pick" data-serve-pick="1">serve</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="row gap wrap actions">
+          <button class="btn btn-ghost" id="saveSetBtn">✔ Save set</button>
+          <button class="btn btn-ghost" id="undoSetBtn">↶ Undo set</button>
+        </div>
+        <p class="hint"><b>Save set</b> records the current games as a finished set (the side ahead wins it) so it shows on the overlay — use it to build up to the 2nd / 3rd set. <b>Undo set</b> removes the last one.</p>
+      </div>
+    </section>
+
+    <!-- RIGHT: configuration -->
+    <section class="col col-config">
+      <div class="card">
+        <div class="card-head"><h2>Teams</h2></div>
+        <div class="teams-grid">
+          <div class="team-edit">
+            <label>Player 1<input type="text" data-team-p1="0" placeholder="Player 1" /></label>
+            <label>Player 2<input type="text" data-team-p2="0" placeholder="Player 2" /></label>
+            <label class="color-label">Colour<input type="color" data-team-color="0" value="#1e88e5" /></label>
+          </div>
+          <div class="team-edit">
+            <label>Player 1<input type="text" data-team-p1="1" placeholder="Player 3" /></label>
+            <label>Player 2<input type="text" data-team-p2="1" placeholder="Player 4" /></label>
+            <label class="color-label">Colour<input type="color" data-team-color="1" value="#e53935" /></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Match format</h2></div>
+        <div class="config-grid">
+          <label>Deuce rule
+            <select id="cfgDeuceMode">
+              <option value="golden">Golden point (sudden death at 40-40)</option>
+              <option value="advantage">Advantage (classic, win by 2)</option>
+              <option value="star">Star point (advantage then sudden death)</option>
+            </select>
+          </label>
+          <label id="starLimitWrap">Star: deuces before sudden death
+            <input type="number" id="cfgStarLimit" min="1" max="9" value="2" />
+          </label>
+          <label>Sets to win match
+            <select id="cfgSetsToWin">
+              <option value="1">1 (single set)</option>
+              <option value="2">2 (best of 3)</option>
+              <option value="3">3 (best of 5)</option>
+            </select>
+          </label>
+          <label>Games per set
+            <input type="number" id="cfgGamesPerSet" min="1" max="9" value="6" />
+          </label>
+          <label class="check"><input type="checkbox" id="cfgTiebreakEnabled" checked /> Tiebreak at games-all</label>
+          <label>Tiebreak points
+            <input type="number" id="cfgTiebreakPoints" min="1" max="21" value="7" />
+          </label>
+          <label class="check"><input type="checkbox" id="cfgTiebreakWinByTwo" checked /> Tiebreak win by 2</label>
+          <label>Final set
+            <select id="cfgFinalSetMode">
+              <option value="normal">Normal set</option>
+              <option value="tiebreak">Tiebreak as usual</option>
+              <option value="superTiebreak">Super tiebreak (whole set)</option>
+            </select>
+          </label>
+          <label>Super tiebreak points
+            <input type="number" id="cfgSuperTbPoints" min="1" max="21" value="10" />
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Overlay display</h2></div>
+        <div class="config-grid">
+          <label>Title (tournament)
+            <input type="text" id="dspTitle" placeholder="e.g. Club Championship" />
+          </label>
+          <label>Subtitle
+            <input type="text" id="dspSubtitle" placeholder="e.g. Semi-final · Court 1" />
+          </label>
+          <label>Theme
+            <select id="dspTheme">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" id="dspShowTitle" checked /> Show title bar</label>
+          <label class="check"><input type="checkbox" id="dspShowPlayers" checked /> Show player names</label>
+          <label class="check"><input type="checkbox" id="dspShowSets" checked /> Show set history</label>
+          <label class="check"><input type="checkbox" id="dspShowServe" checked /> Show serve indicator</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>OBS overlay URL</h2></div>
+        <div class="row gap wrap">
+          <label class="grow">Position
+            <select id="ovPos">
+              <option value="bottom-left">Bottom left</option>
+              <option value="bottom-right">Bottom right</option>
+              <option value="bottom-center">Bottom center</option>
+              <option value="top-left">Top left</option>
+              <option value="top-right">Top right</option>
+              <option value="top-center">Top center</option>
+            </select>
+          </label>
+          <label>Scale
+            <input type="number" id="ovScale" min="0.3" max="3" step="0.05" value="1" />
+          </label>
+        </div>
+        <div class="row gap url-row">
+          <input type="text" id="overlayUrl" readonly />
+          <button class="btn btn-ghost" id="copyUrlBtn">Copy</button>
+          <button class="btn btn-ghost" id="openOverlayBtn">Open</button>
+        </div>
+        <p class="hint">In OBS: Sources → + → Browser → paste this URL. Set width 1920, height 1080, tick “transparent”.</p>
+      </div>
+
+      <div class="card danger-card">
+        <div class="card-head"><h2>Reset</h2></div>
+        <div class="row gap wrap">
+          <button class="btn btn-warn" id="resetMatchBtn">Reset score (keep teams)</button>
+          <button class="btn btn-danger" id="resetAllBtn">Reset everything</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="scoring.js"></script>
+  <script src="client.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

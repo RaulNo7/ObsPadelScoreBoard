@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Padel Scoreboard — Overlay</title>
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div id="scoreboard" class="scoreboard hidden" data-theme="dark">
+    <div id="titleBar" class="title-bar">
+      <span id="title" class="title"></span>
+      <span id="subtitle" class="subtitle"></span>
+    </div>
+
+    <div class="board">
+      <div class="team-row" data-team="0">
+        <span class="accent" data-accent="0"></span>
+        <span class="serve" data-serve="0" title="serving">●</span>
+        <span class="team-info">
+          <span class="team-name" data-name="0"></span>
+          <span class="players" data-players="0"></span>
+        </span>
+        <span class="sets" data-sets="0"></span>
+        <span class="games" data-games="0">0</span>
+        <span class="points" data-points="0">0</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="team-row" data-team="1">
+        <span class="accent" data-accent="1"></span>
+        <span class="serve" data-serve="1" title="serving">●</span>
+        <span class="team-info">
+          <span class="team-name" data-name="1"></span>
+          <span class="players" data-players="1"></span>
+        </span>
+        <span class="sets" data-sets="1"></span>
+        <span class="games" data-games="1">0</span>
+        <span class="points" data-points="1">0</span>
+      </div>
+    </div>
+
+    <div id="winnerBanner" class="winner-banner hidden"></div>
+  </div>
+
+  <script src="scoring.js"></script>
+  <script src="client.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>
