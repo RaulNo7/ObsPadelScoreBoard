@@ -16,8 +16,9 @@ URL as a Browser Source in OBS. Score updates appear on stream instantly.
 - **Three deuce rules**, switchable per match:
   - **Golden point** — sudden-death deciding point at 40-40.
   - **Advantage** — classic, win the game by two points.
-  - **Star point** — advantage play, but the deciding point becomes sudden-death
-    after a configurable number of deuces (default 2).
+  - **Star point** — advantage play for a configurable number of deuces, then the
+    next deuce becomes a sudden-death golden point (default: 2 deuces, so 40-40 and
+    4-4 are advantage and 5-5 is golden).
 - **Fully configurable format**: sets to win (best of 1/3/5), games per set,
   tiebreak on/off + target points + win-by-two, and a final-set mode
   (normal / tiebreak / whole-set super tiebreak).
@@ -107,9 +108,11 @@ A padel game runs `0 → 15 → 30 → 40 → game`. At **40-40** the configured
 
 - **Golden point**: the next point wins the game.
 - **Advantage**: a team must lead by two points (Ad → game).
-- **Star point**: plays as advantage until `starDeuceLimit` deuces have occurred
-  (3-3 is deuce #1, 4-4 is deuce #2, …); once that limit is reached the next 40-40
-  is a sudden-death point. With the default limit of **2**, the point at **4-4** is golden.
+- **Star point**: plays as advantage for the first *N* deuces, then the next deuce is
+  a sudden-death golden point. The admin field **"deuces before golden point"** is *N*
+  (default **2**). 3-3 is deuce #1, 4-4 is deuce #2, 5-5 is deuce #3, … so with the
+  default *N* = 2, **40-40 and 4-4 are advantage and 5-5 is the golden point**.
+  (Internally this is stored as `starDeuceLimit` = *N* + 1, the deuce number that is golden.)
 
 A set is won at `gamesPerSet` games with a two-game lead. At games-all (e.g. 6-6)
 a tiebreak is played if enabled (first to `tiebreakPoints`, win by two if set).

@@ -27,7 +27,7 @@ function createDefaultState() {
   return {
     config: {
       deuceMode: 'golden', // 'golden' | 'advantage' | 'star'
-      starDeuceLimit: 2, // star mode: deuces played before sudden death kicks in
+      starDeuceLimit: 3, // star mode: the Nth deuce is golden (so N-1 advantage deuces are played first; 3 => 40-40 & 4-4 advantage, 5-5 golden)
       gamesPerSet: 6,
       setsToWin: 2, // best of 3
       tiebreakEnabled: true,

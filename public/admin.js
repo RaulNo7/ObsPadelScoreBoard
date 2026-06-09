@@ -84,7 +84,9 @@
       type: 'setConfig',
       config: {
         deuceMode: $('#cfgDeuceMode').value,
-        starDeuceLimit: clampNum($('#cfgStarLimit').value, 1, 9, 2),
+        // UI shows "deuces before golden point"; engine stores the deuce
+        // number that is golden, i.e. (deuces before) + 1.
+        starDeuceLimit: clampNum($('#cfgStarLimit').value, 1, 8, 2) + 1,
         setsToWin: clampNum($('#cfgSetsToWin').value, 1, 3, 2),
         gamesPerSet: clampNum($('#cfgGamesPerSet').value, 1, 9, 6),
         tiebreakEnabled: $('#cfgTiebreakEnabled').checked,
@@ -236,7 +238,7 @@
 
     const c = s.config;
     setVal('#cfgDeuceMode', c.deuceMode);
-    setVal('#cfgStarLimit', c.starDeuceLimit);
+    setVal('#cfgStarLimit', Math.max(1, (c.starDeuceLimit || 2) - 1)); // engine value -> "deuces before golden"
     setVal('#cfgSetsToWin', String(c.setsToWin));
     setVal('#cfgGamesPerSet', c.gamesPerSet);
     setChk('#cfgTiebreakEnabled', c.tiebreakEnabled);
